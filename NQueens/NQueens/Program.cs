@@ -56,20 +56,23 @@ namespace nQ
     //------------------------------------------------------------------------------------------------
     public void Print()
     {
-      if (CheckFinal())
+      if (N < 30)
       {
-        for (int i = 0; i < N; i++)
+        if (CheckFinal())
         {
-          Console.WriteLine("");
-          for (int j = 0; j < N; j++)
+          for (int i = 0; i < N; i++)
           {
-            
-              Console.Write("{0}", m_Board[i][j]);
-            
-          }
+            Console.WriteLine("");
+            for (int j = 0; j < N; j++)
+            {
 
+              Console.Write("{0}", m_Board[i][j]);
+
+            }
+
+          }
+          Console.WriteLine("");
         }
-        Console.WriteLine("");
       }
     }
 
@@ -220,7 +223,7 @@ namespace nQ
 
       Console.WriteLine("Printing... ");
 
-      if (queens.N < 30)
+      
         queens.Print();
 
       queens.PrintFile("result.txt");
