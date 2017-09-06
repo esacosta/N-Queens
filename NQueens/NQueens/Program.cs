@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Threading;
 
 namespace nQ
 {
+  //------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------------
   class cQueens
   {
     int N = 4;
-    int[][] m_Board;
+    private int[][] m_Board;
 
     static ProgressBar m_Progress;
     static int m_nProgress = 0;
@@ -41,15 +44,24 @@ namespace nQ
     //------------------------------------------------------------------------------------------------
     private bool CheckFinal()
     {
+      int nQueens = 0;
       for (int r = 0; r < N; r++)
       {
         for (int c = 0; c < N; c++)
         {
           if (m_Board[r][c] == 1)
+          {
             if (CheckSq(r, c) == false)
               return false;
+            else
+              nQueens++;
+          }
         }
       }
+
+      if (nQueens != N)
+        return false;
+
       return true;
     }
 
@@ -69,10 +81,11 @@ namespace nQ
               Console.Write("{0}", m_Board[i][j]);
 
             }
-
+            Console.WriteLine("");
           }
-          Console.WriteLine("");
         }
+        else
+          Console.WriteLine("Solution does not exist");
       }
     }
 
@@ -85,15 +98,17 @@ namespace nQ
         {
           for (int i = 0; i < N; i++)
           {
-            file.WriteLine("");
             for (int j = 0; j < N; j++)
             {
-              
-                file.Write("{0}", m_Board[i][j]);
-              
+              file.Write("{0}", m_Board[i][j]);
             }
+            file.WriteLine("");
           }
-          file.WriteLine("");
+        }
+        else
+        {
+          file.WriteLine("Solution does not exist");
+          Console.WriteLine("Solution does not exist");
         }
       }
     }
@@ -119,6 +134,31 @@ namespace nQ
     }
 
     //------------------------------------------------------------------------------------------------
+    bool FindOld(int col)
+    {
+      if (col >= N)
+        return true;
+
+      for (int i = 0; i < N; i++)
+      {
+        if (IsValid(i, col))
+        {
+          m_Board[i][col] = 1;
+
+          m_Progress.Report((double)m_nProgress++ / N);
+
+          if (FindOld(col + 1))
+            return true;
+
+          m_Progress.Report((double)m_nProgress-- / N);
+          m_Board[i][col] = 0;
+        }
+      }
+      
+      return false;
+    }
+
+    //------------------------------------------------------------------------------------------------
     bool Find(int col)
     {
       if (col >= N)
@@ -130,7 +170,6 @@ namespace nQ
         {
           if (IsValid(i, col))
           {
-            Print();
             m_Board[i][col] = 1;
 
             m_Progress.Report((double)m_nProgress++ / N);
@@ -150,7 +189,6 @@ namespace nQ
         {
           if (IsValid(i, col))
           {
-            Print();
             m_Board[i][col] = 1;
             m_Progress.Report((double)m_nProgress++ / N);
 
@@ -162,7 +200,7 @@ namespace nQ
           }
         }
       }
-
+      
       return false;
     }
 
@@ -186,21 +224,11 @@ namespace nQ
     }
 
     //------------------------------------------------------------------------------------------------
-    static void Main(string[] args)
-    {
-      cQueens queens = new cQueens();
-      if (args.Length <= 0)
-      {
-        Console.Write("N: ");
-        string strN = Console.ReadLine();
-        Console.WriteLine("Finding {0} Queens in {0}x{0} board", strN);
-        queens.N = int.Parse(strN);
-      }
-      else
-      {
-        queens.N = int.Parse(args[0].ToString());
-      }
+    static cQueens queens = new cQueens();
 
+    //------------------------------------------------------------------------------------------------
+    static void Do_Work(object starttime)
+    {
       m_Progress = new ProgressBar();
       var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -223,12 +251,56 @@ namespace nQ
 
       Console.WriteLine("Printing... ");
 
-      
-        queens.Print();
-
-      queens.PrintFile("result.txt");
+      queens.Print();
+      string strFile = string.Format("result{0}.txt", queens.N);
+      queens.PrintFile(strFile);
       Console.WriteLine("Done.");
       m_Progress.Dispose();
+    }
+
+    //------------------------------------------------------------------------------------------------
+    static void Times_up(object thread)
+    {
+      Thread t = (Thread)thread;
+      Console.WriteLine("\nTime's Up!");
+      string strFile = string.Format("NOT found result{0}.txt", queens.N);
+      queens.PrintFile(strFile);
+      t.Abort();
+    }
+
+    //------------------------------------------------------------------------------------------------
+    static void Main(string[] args)
+    { 
+      if (args.Length <= 0)
+      {
+        Console.WriteLine("Number of queens (0 to find all queens from 4 to 1000 waiting 10 secs to find bugs)");
+        Console.Write("N: ");
+        string strN = Console.ReadLine();
+        Console.WriteLine("Finding {0} Queens in {0}x{0} board", strN);
+        queens.N = int.Parse(strN);
+      }
+      else
+      {
+        queens.N = int.Parse(args[0].ToString());
+      }
+
+      if (queens.N == 0)
+      {
+        for (queens.N = 4; queens.N < 1000; queens.N++)
+        {
+          Thread work = new Thread(Do_Work);
+          Timer timer = new Timer(Times_up, work, 10000, Timeout.Infinite);
+          DateTime StartTime = DateTime.Now;
+          work.Start(StartTime);
+          work.Join();
+          Console.Write("End");
+          timer.Dispose();
+        }
+      }
+      else
+        Do_Work(DateTime.Now);
+
+
       Console.ReadKey();
     }
   }
