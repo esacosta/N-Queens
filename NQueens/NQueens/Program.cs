@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace nQ
@@ -7,20 +8,73 @@ namespace nQ
   {
     //------------------------------------------------------------------------------------------------
     static int N = 4;
-    //------------------------------------------------------------------------------------------------
+    static List<Thread> listThBacktraking = new List<Thread>();// workBacktraking;
+    static List<Thread> listThMinConflict = new List<Thread>();// workBacktraking;
+    //static Thread workMinConflict;
+
     static void Do_Work(object starttime)
+    {
+      Thread workBacktraking = new Thread(Do_WorkBacktraking);
+      Thread workMinConflict = new Thread(Do_WorkMinConflict);
+
+      listThBacktraking.Add(workBacktraking);
+      listThMinConflict.Add(workMinConflict);
+
+      workBacktraking.Start(starttime);
+      workMinConflict.Start(starttime);
+
+      workBacktraking.Join();
+      workMinConflict.Join();
+    }
+    //------------------------------------------------------------------------------------------------
+    static void Do_WorkBacktraking(object starttime)
+    {
+      var watch = System.Diagnostics.Stopwatch.StartNew();
+
+      //CQueensMinConflict board = new CQueensMinConflict(N);
+      CQueensBacktraking board = new CQueensBacktraking(N);
+
+      Console.WriteLine("Searching by Backtraking... ");
+      board.Find();
+
+      board.Dispose();
+      watch.Stop();
+
+      foreach (Thread th in listThMinConflict)
+        th.Abort();
+      TimeSpan ts = watch.Elapsed;
+
+      string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+      Console.WriteLine("RunTime " + elapsedTime);
+
+      Console.WriteLine("Printing... ");
+
+      board.Print();
+      string strFile = string.Format("result{0}.txt", N);
+
+      board.PrintFile(strFile);
+      Console.WriteLine("Done by Backtraking.");
+     
+    }
+
+    //------------------------------------------------------------------------------------------------
+    static void Do_WorkMinConflict(object starttime)
     {
       var watch = System.Diagnostics.Stopwatch.StartNew();
 
       CQueensMinConflict board = new CQueensMinConflict(N);
-      //CQueensBacktraking board = new CQueensBacktraking(N);
+     // CQueensBacktraking board = new CQueensBacktraking(N);
 
-      Console.WriteLine("Searching... ");
+      Console.WriteLine("Searching by MinConflict... ");
       board.Find();
       
       board.Dispose();
       watch.Stop();
-      
+      foreach (Thread th in listThBacktraking)
+        th.Abort();
+
+
+
       TimeSpan ts = watch.Elapsed;
 
       string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
@@ -32,7 +86,8 @@ namespace nQ
       string strFile = string.Format("result{0}.txt", N);
  
       board.PrintFile(strFile);
-      Console.WriteLine("Done.");
+      Console.WriteLine("Done by MinConflict.");
+     
     }
 
     //------------------------------------------------------------------------------------------------
@@ -46,6 +101,7 @@ namespace nQ
         file.WriteLine(strFile);
       }
       t.Abort();
+      
     }
 
     //------------------------------------------------------------------------------------------------
@@ -66,7 +122,7 @@ namespace nQ
 
       if (N == 0)
       {
-        for (N = 4; N < 1000; N++)
+        for (N = 0; N <= 1000; N++)
         {
           Thread work = new Thread(Do_Work);
           Timer timer = new Timer(Times_up, work, 10000, Timeout.Infinite);
@@ -75,6 +131,12 @@ namespace nQ
           work.Join();
           Console.Write("End");
           timer.Dispose();
+         
+          //workBacktraking.Abort();
+          //workMinConflict.Abort();
+          //workBacktraking = null;
+          //workMinConflict = null;
+
         }
       }
       else

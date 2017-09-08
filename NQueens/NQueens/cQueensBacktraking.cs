@@ -9,8 +9,8 @@ namespace nQ
   {
     public int N = 4;
     private bool[][] m_Board;
-    private ProgressBar m_Progress;
-    private int m_nProgress = 0;
+    //private ProgressBar m_Progress;
+    //private int m_nProgress = 0;
 
     public CQueensBacktraking(int n)
     {
@@ -20,7 +20,7 @@ namespace nQ
 
     public void Dispose()
     {
-      m_Progress.Dispose();
+      //m_Progress.Dispose();
     }
 
     //------------------------------------------------------------------------------------------------
@@ -152,12 +152,12 @@ namespace nQ
         {
           m_Board[i][col] = true;
 
-          m_Progress.Report((double)m_nProgress++ / N);
+          //m_Progress.Report((double)m_nProgress++ / N);
 
           if (FindOld(col + 1))
             return true;
 
-          m_Progress.Report((double)m_nProgress-- / N);
+          //m_Progress.Report((double)m_nProgress-- / N);
           m_Board[i][col] = false;
         }
       }
@@ -179,12 +179,12 @@ namespace nQ
           {
             m_Board[i][col] = true;
 
-            m_Progress.Report((double)m_nProgress++ / N);
+            //m_Progress.Report((double)m_nProgress++ / N);
 
             if (Find(col + 1))
               return true;
 
-            m_Progress.Report((double)m_nProgress-- / N);
+            //m_Progress.Report((double)m_nProgress-- / N);
             m_Board[i][col] = false;
           }
         }
@@ -197,14 +197,14 @@ namespace nQ
         {
           if (IsValid(i, col))
           {
-            Print(true);
+            
             m_Board[i][col] = true;
-            m_Progress.Report((double)m_nProgress++ / N);
+            //m_Progress.Report((double)m_nProgress++ / N);
 
             if (Find(col + 1))
               return true;
 
-            m_Progress.Report((double)m_nProgress-- / N);
+            //m_Progress.Report((double)m_nProgress-- / N);
             m_Board[i][col] = false;
           }
         }
@@ -216,8 +216,8 @@ namespace nQ
     //------------------------------------------------------------------------------------------------
     void Init()
     {
-      Console.WriteLine("Initializing... ");
-      using (var progress = new ProgressBar())
+      //Console.WriteLine("Initializing... ");
+      //using (var progress = new ProgressBar())
       {
         m_Board = new bool[N][];
         for (int i = 0; i < N; i++)
@@ -225,12 +225,12 @@ namespace nQ
           m_Board[i] = new bool[N];
           Array.Clear(m_Board[i], 0, N);
                    
-          progress.Report((double)i / N);
+         // progress.Report((double)i / N);
         }
       }
-      m_Progress = new ProgressBar();
+      //m_Progress = new ProgressBar();
       
-      Console.WriteLine("Done.");
+      //Console.WriteLine("Done.");
 
     }
 

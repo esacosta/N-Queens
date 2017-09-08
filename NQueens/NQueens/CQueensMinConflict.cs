@@ -25,18 +25,49 @@ namespace nQ
     }
 
     //--------------------------------------------------------------------------------
-    void Init()
+    void Init(bool bRand = false)
     {
-     for (int i = 0, j = 0; i < N; i++)
-      {
-        if (((i) * 2)+1 >= N)
-          m_Board[i] = (j++ * 2);
-        else
+    if(bRand == true)
+    {
+        for (int i = 0, n = m_Board.Length; i < n; i++)
         {
-          m_Board[i] = ((i) * 2)+1;
+          int j = random.Next(n);
+          int rowToSwap = m_Board[i];
+          m_Board[i] = m_Board[j];
+          m_Board[j] = rowToSwap;
         }
-        
       }
+    else
+    {
+        for (int i = 0, j = 0; i < N; i++)
+        {
+          if (((i) * 2) + 1 >= N)
+          {
+            if (j==0)
+            {
+              if (IsValid(i, (j++ * 2)) > 0)
+              {
+                m_Board[i] = random.Next(N - 1);
+                j += 2;
+              }
+            }
+            else
+              m_Board[i] = (j++ * 2);
+     
+             
+
+          }
+          else
+          {
+            m_Board[i] = ((i) * 2) + 1;
+          }
+
+        }
+
+      }
+      
+      
+     
       Print();
       for (int i = 0; i < N; i++)
       if (m_Board[i]>=N ||m_Board[i]<0)
@@ -73,7 +104,7 @@ namespace nQ
 
       List<int> candidates = new List<int>();
 
-      using (var progress = new ProgressBar())
+      //using (var progress = new ProgressBar())
       {
         while (true)
         {
@@ -128,10 +159,10 @@ namespace nQ
           }
 
           moves++;
-          progress.Report((double)moves /( N/2));
+          //progress.Report((double)moves /( N/2));
           if (moves == m_Board.Length * 2)
           {
-            Init();
+            Init(true);
             moves = 0;
           }
           
