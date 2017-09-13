@@ -8,15 +8,15 @@ namespace nQ
   {
     //------------------------------------------------------------------------------------------------
     static int N = 4;
-    static List<Thread> listThBacktraking = new List<Thread>();// workBacktraking;
-    static List<Thread> listThMinConflict = new List<Thread>();// workBacktraking;
-    //static Thread workMinConflict;
 
+    static List<Thread> listThBacktraking = new List<Thread>();
+    static List<Thread> listThMinConflict = new List<Thread>();
+    
     static void Do_Work(object starttime)
     {
       Thread workBacktraking = new Thread(Do_WorkBacktraking);
       Thread workMinConflict = new Thread(Do_WorkMinConflict);
-
+    
       listThBacktraking.Add(workBacktraking);
       listThMinConflict.Add(workMinConflict);
 
@@ -31,10 +31,9 @@ namespace nQ
     {
       var watch = System.Diagnostics.Stopwatch.StartNew();
 
-      //CQueensMinConflict board = new CQueensMinConflict(N);
       CQueensBacktraking board = new CQueensBacktraking(N);
 
-      Console.WriteLine("Searching by Backtraking... ");
+      Console.WriteLine("Searching by Heuristic confirm by Backtraking... ");
       board.Find();
 
       board.Dispose();
@@ -44,17 +43,15 @@ namespace nQ
         th.Abort();
       TimeSpan ts = watch.Elapsed;
 
-      string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+      string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
       Console.WriteLine("RunTime " + elapsedTime);
-
-      Console.WriteLine("Printing... ");
-
-      board.Print();
-      string strFile = string.Format("result{0}.txt", N);
-
-      board.PrintFile(strFile);
       Console.WriteLine("Done by Backtraking.");
-     
+
+      Console.Write("Printing... ");
+      board.Print();
+
+      board.PrintFile(string.Format("result{0}.txt", N));
+      Console.WriteLine("Done");
     }
 
     //------------------------------------------------------------------------------------------------
@@ -63,9 +60,8 @@ namespace nQ
       var watch = System.Diagnostics.Stopwatch.StartNew();
 
       CQueensMinConflict board = new CQueensMinConflict(N);
-     // CQueensBacktraking board = new CQueensBacktraking(N);
-
-      Console.WriteLine("Searching by MinConflict... ");
+     
+      Console.WriteLine("Searching by Heuristic confirm by MinConflict... ");
       board.Find();
       
       board.Dispose();
@@ -77,17 +73,15 @@ namespace nQ
 
       TimeSpan ts = watch.Elapsed;
 
-      string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+      string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
       Console.WriteLine("RunTime " + elapsedTime);
-
-      Console.WriteLine("Printing... ");
-
-      board.Print();
-      string strFile = string.Format("result{0}.txt", N);
- 
-      board.PrintFile(strFile);
       Console.WriteLine("Done by MinConflict.");
-     
+
+      Console.Write("Printing... ");
+      board.Print();
+      board.PrintFile(string.Format("result{0}.txt", N));
+      Console.WriteLine("Done");
+
     }
 
     //------------------------------------------------------------------------------------------------
@@ -131,12 +125,6 @@ namespace nQ
           work.Join();
           Console.Write("End");
           timer.Dispose();
-         
-          //workBacktraking.Abort();
-          //workMinConflict.Abort();
-          //workBacktraking = null;
-          //workMinConflict = null;
-
         }
       }
       else
