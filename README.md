@@ -2,6 +2,8 @@
 
 Fastest N-Queens
 
+http://esacosta.com/nqueens.esacosta.com
+
 Using:
 . Heuristic
 . Backtracking
